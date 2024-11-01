@@ -1,11 +1,16 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const sqlite3 = require('sqlite3').verbose(); // Importando sqlite3
+// server.js
+import express from 'express';
+import http from 'http';
+import { Server as SocketIoServer } from 'socket.io';
+import sqlite3 from 'sqlite3';
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+
+// Carregar variáveis de ambiente do arquivo .env
+dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const PORT = process.env.PORT || 3000;
 
 // Criar ou abrir o banco de dados
 const db = new sqlite3.Database('usuarios.db', (err) => {
@@ -13,41 +18,60 @@ const db = new sqlite3.Database('usuarios.db', (err) => {
     console.error('Erro ao abrir o banco de dados:', err.message);
   } else {
     console.log('Conectado ao banco de dados SQLite.');
-    
+
     // Criar a tabela se não existir
     db.run(`CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT,
-      email TEXT,
+      email TEXT UNIQUE,
       telefone TEXT,
       senha TEXT
-    )`);
+    )`, (err) => {
+      if (err) {
+        console.error('Erro ao criar a tabela:', err.message);
+      }
+    });
   }
 });
 
-app.use(express.static(__dirname + '/public'));
+// Criar o servidor HTTP e o servidor Socket.IO
+const server = http.createServer(app);
+const io = new SocketIoServer(server);
 
-// Rota principal para servir o index.html
-app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+// Middleware para retornar a variável de ambiente
+app.get('/welcome', (req, res) => {
+  res.json({
+    message: 'Bem-vindo ao servidor!',
+    token: process.env.GANHARDINHEIRO_TOKEN,
+  });
 });
 
-io.on('connection', (socket) => {
-  console.log('Novo usuário conectado');
+// Rota principal
+app.get('/', (req, res) => {
+  res.send('Servidor em execução! Acesse /welcome para ver o token.');
+});
 
-  // Receber os dados do formulário e salvar no banco de dados
-  socket.on('formData', (data) => {
-    const { name, email, phone, password } = data;
+// Função para inserir dados no banco de dados
+const saveUser = (data, socket) => {
+  const { name, email, phone, password } = data;
 
-    // Validação básica
-    if (!name || !email || !phone || !password) {
-      socket.emit('formResponse', { success: false, message: 'Todos os campos são obrigatórios.' });
+  // Validação básica
+  if (!name || !email || !phone || !password) {
+    socket.emit('formResponse', { success: false, message: 'Todos os campos são obrigatórios.' });
+    return;
+  }
+
+  // Criptografar a senha
+  bcrypt.hash(password, 10, (err, hash) => {
+    if (err) {
+      console.error('Erro ao criptografar a senha:', err.message);
+      socket.emit('formResponse', { success: false, message: 'Erro ao criptografar a senha.' });
       return;
     }
 
     // Inserir os dados no banco de dados
     db.run(`INSERT INTO usuarios (nome, email, telefone, senha) VALUES (?, ?, ?, ?)`, 
-      [name, email, phone, password], 
+      [name, email, phone, hash], 
       function(err) {
         if (err) {
           console.error('Erro ao salvar os dados:', err.message);
@@ -55,7 +79,7 @@ io.on('connection', (socket) => {
         } else {
           console.log('Dados salvos com sucesso!', this.lastID); // Exibe o ID do registro inserido
           socket.emit('formResponse', { success: true, message: 'Dados salvos com sucesso!' });
-          
+
           // Verifique os dados inseridos
           db.all(`SELECT * FROM usuarios`, [], (err, rows) => {
             if (err) {
@@ -67,13 +91,26 @@ io.on('connection', (socket) => {
         }
       });
   });
+};
+
+// Gerenciar conexões de socket
+io.on('connection', (socket) => {
+  console.log('Novo usuário conectado');
+
+  // Receber os dados do formulário e salvar no banco de dados
+  socket.on('formData', (data) => {
+    saveUser(data, socket);
+  });
 
   socket.on('disconnect', () => {
     console.log('Usuário desconectado');
   });
 });
 
-// Inicializar o servidor na porta 3000
-server.listen(3000, () => {
-  console.log('Servidor rodando em http://localhost:3000');
+// Servir arquivos estáticos
+app.use(express.static('public'));
+
+// Inicializar o servidor na porta definida
+server.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
