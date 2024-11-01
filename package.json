@@ -1,0 +1,15 @@
+{
+  "name": "curso-lucrativo",
+  "version": "1.0.0",
+  "description": "Curso gratuito de vídeos lucrativos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Seu Nome",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1"
+  }
+}

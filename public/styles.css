@@ -1,0 +1,185 @@
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    max-width: 900px;
+    width: 90%;
+    margin: 20px;
+    height: auto;
+}
+
+.image-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.promo-image {
+    max-width: 80%;
+    height: auto;
+    border-radius: 15px;
+}
+
+.overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.form-container {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #d9534f;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+form {
+    transition: all 0.3s ease;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus {
+    border-color: #d9534f;
+    outline: none;
+}
+
+button {
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #c9302c;
+}
+
+.alert {
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #5cb85c;
+}
+
+/* Estilo para a seção de comentários */
+.comments-section {
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.comments-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.comment {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.comment-photo {
+    width: 60px; /* Tamanho fixo para as fotos */
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px; /* Espaço entre a foto e o texto */
+}
+
+.comment-text {
+    flex: 1; /* O texto ocupa o restante do espaço */
+}
+
+.comment-text h3 {
+    margin-bottom: 5px;
+    color: #d9534f;
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 600px) {
+    .container {
+        flex-direction: column; /* Coloca os elementos um abaixo do outro */
+    }
+
+    .image-container,
+    .form-container {
+        width: 100%; /* Faz os containers ocuparem toda a largura */
+        margin: 10px 0; /* Espaçamento vertical entre os containers */
+    }
+    
+    h1 {
+        font-size: 2rem; /* Ajusta o tamanho do título para telas menores */
+    }
+
+    p {
+        font-size: 1rem; /* Ajusta o tamanho do parágrafo para telas menores */
+    }
+}
